@@ -9,8 +9,11 @@
 *.user
 *.userosscache
 *.sln.docstates
+
+# ライブラリ、アセットフォルダ
 Assets/
 Assimp/
+stb-master/
 
 
 # User-specific files (MonoDevelop/Xamarin Studio)
