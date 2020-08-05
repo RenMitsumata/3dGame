@@ -115,13 +115,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Sources\AudioManager.cpp" />
+    <ClCompile Include="Sources\Collision.cpp" />
+    <ClCompile Include="Sources\CollisionManager.cpp" />
     <ClCompile Include="Sources\DXManager.cpp" />
+    <ClCompile Include="Sources\InputManager.cpp" />
     <ClCompile Include="Sources\main.cpp" />
     <ClCompile Include="Sources\Manager.cpp" />
     <ClCompile Include="Sources\WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Sources\AudioManager.h" />
+    <ClInclude Include="Sources\Collision.h" />
+    <ClInclude Include="Sources\CollisionManager.h" />
     <ClInclude Include="Sources\DXManager.h" />
+    <ClInclude Include="Sources\InputManager.h" />
     <ClInclude Include="Sources\main.h" />
     <ClInclude Include="Sources\Manager.h" />
     <ClInclude Include="Sources\WindowManager.h" />

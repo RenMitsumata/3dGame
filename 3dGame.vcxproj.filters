@@ -13,32 +13,62 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ソース ファイル\各種Managerクラス">
+      <UniqueIdentifier>{6d1e25ea-df16-4020-baf1-8483506a333e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\各種Managerクラス">
+      <UniqueIdentifier>{71ec6eeb-83fb-4540-9505-179038d640cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Sources\DXManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\Manager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\WindowManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\AudioManager.cpp">
+      <Filter>ソース ファイル\各種Managerクラス</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\CollisionManager.cpp">
+      <Filter>ソース ファイル\各種Managerクラス</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\DXManager.cpp">
+      <Filter>ソース ファイル\各種Managerクラス</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\InputManager.cpp">
+      <Filter>ソース ファイル\各種Managerクラス</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Manager.cpp">
+      <Filter>ソース ファイル\各種Managerクラス</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\WindowManager.cpp">
+      <Filter>ソース ファイル\各種Managerクラス</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Collision.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Sources\DXManager.h">
+    <ClInclude Include="Sources\main.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\AudioManager.h">
+      <Filter>ヘッダー ファイル\各種Managerクラス</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\CollisionManager.h">
+      <Filter>ヘッダー ファイル\各種Managerクラス</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\InputManager.h">
+      <Filter>ヘッダー ファイル\各種Managerクラス</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\DXManager.h">
+      <Filter>ヘッダー ファイル\各種Managerクラス</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Manager.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\各種Managerクラス</Filter>
     </ClInclude>
     <ClInclude Include="Sources\WindowManager.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\各種Managerクラス</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\main.h">
+    <ClInclude Include="Sources\Collision.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

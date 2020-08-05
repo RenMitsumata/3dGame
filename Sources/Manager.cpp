@@ -35,10 +35,11 @@ Manager::~Manager()
 
 void Manager::Init(HINSTANCE hInstance, int nCmdShow)
 {
-	/*window = new Window;
-	window->Init(hInstance,nCmdShow);
+	window = new WindowManager;
+	window->Init(hInstance, nCmdShow);
 	dxManager = new DXManager;
 	dxManager->Init();
+	/*
 	input = new InputManager;
 	input->Init();
 	colManager = new CollisionManager;
@@ -76,7 +77,7 @@ void Manager::Uninit()
 		delete scene;
 	}
 	scene = nullptr;
-
+	*/
 	if (dxManager) {
 		dxManager->Uninit();
 		delete dxManager;
@@ -87,7 +88,7 @@ void Manager::Uninit()
 		window->Uninit();
 		delete window;
 	}
-	window = nullptr;*/
+	window = nullptr;
 }
 
 void Manager::Update()
