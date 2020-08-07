@@ -19,6 +19,12 @@
     <Filter Include="ヘッダー ファイル\各種Managerクラス">
       <UniqueIdentifier>{71ec6eeb-83fb-4540-9505-179038d640cf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\各種Collisionクラス">
+      <UniqueIdentifier>{66b14794-23f2-4b1c-8de5-7fa8ab086318}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\各種Collisionクラス">
+      <UniqueIdentifier>{30194389-8632-44c8-9eaa-a36365f2cee0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\main.cpp">
@@ -43,6 +49,24 @@
       <Filter>ソース ファイル\各種Managerクラス</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Collision.cpp">
+      <Filter>ソース ファイル\各種Collisionクラス</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\CollisionCapsule.cpp">
+      <Filter>ソース ファイル\各種Collisionクラス</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\CollisionCone.cpp">
+      <Filter>ソース ファイル\各種Collisionクラス</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\CollisionOBB.cpp">
+      <Filter>ソース ファイル\各種Collisionクラス</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\CollisionSphere.cpp">
+      <Filter>ソース ファイル\各種Collisionクラス</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Component.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\GameObject.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -69,6 +93,24 @@
       <Filter>ヘッダー ファイル\各種Managerクラス</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Collision.h">
+      <Filter>ヘッダー ファイル\各種Collisionクラス</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\CollisionCapsule.h">
+      <Filter>ヘッダー ファイル\各種Collisionクラス</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\CollisionCone.h">
+      <Filter>ヘッダー ファイル\各種Collisionクラス</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\CollisionOBB.h">
+      <Filter>ヘッダー ファイル\各種Collisionクラス</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\CollisionSphere.h">
+      <Filter>ヘッダー ファイル\各種Collisionクラス</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Component.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\GameObject.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

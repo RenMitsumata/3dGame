@@ -117,8 +117,14 @@
   <ItemGroup>
     <ClCompile Include="Sources\AudioManager.cpp" />
     <ClCompile Include="Sources\Collision.cpp" />
+    <ClCompile Include="Sources\CollisionCapsule.cpp" />
+    <ClCompile Include="Sources\CollisionCone.cpp" />
     <ClCompile Include="Sources\CollisionManager.cpp" />
+    <ClCompile Include="Sources\CollisionOBB.cpp" />
+    <ClCompile Include="Sources\CollisionSphere.cpp" />
+    <ClCompile Include="Sources\Component.cpp" />
     <ClCompile Include="Sources\DXManager.cpp" />
+    <ClCompile Include="Sources\GameObject.cpp" />
     <ClCompile Include="Sources\InputManager.cpp" />
     <ClCompile Include="Sources\main.cpp" />
     <ClCompile Include="Sources\Manager.cpp" />
@@ -127,8 +133,14 @@
   <ItemGroup>
     <ClInclude Include="Sources\AudioManager.h" />
     <ClInclude Include="Sources\Collision.h" />
+    <ClInclude Include="Sources\CollisionCapsule.h" />
+    <ClInclude Include="Sources\CollisionCone.h" />
     <ClInclude Include="Sources\CollisionManager.h" />
+    <ClInclude Include="Sources\CollisionOBB.h" />
+    <ClInclude Include="Sources\CollisionSphere.h" />
+    <ClInclude Include="Sources\Component.h" />
     <ClInclude Include="Sources\DXManager.h" />
+    <ClInclude Include="Sources\GameObject.h" />
     <ClInclude Include="Sources\InputManager.h" />
     <ClInclude Include="Sources\main.h" />
     <ClInclude Include="Sources\Manager.h" />

@@ -9,10 +9,9 @@
 //#include "Scene.h"
 //#include "Game.h"
 //#include "Title.h"
-//#include "InputManager.h"
-//#include "CollisionManager.h"
-//#include "AudioManager.h"
-//#include "EnemyManager.h"
+#include "InputManager.h"
+#include "CollisionManager.h"
+#include "AudioManager.h"
 
 #include "Manager.h"
 
@@ -39,13 +38,14 @@ void Manager::Init(HINSTANCE hInstance, int nCmdShow)
 	window->Init(hInstance, nCmdShow);
 	dxManager = new DXManager;
 	dxManager->Init();
-	/*
+	
 	input = new InputManager;
 	input->Init();
 	colManager = new CollisionManager;
 	colManager->Init();
 	audio = new AudioManager;
 	audio->Init();
+	/*
 	enemyManager = new EnemyManager;
 	enemyManager->Init();
 	scene = new Title;
@@ -60,6 +60,12 @@ void Manager::Uninit()
 		delete enemyManager;
 		enemyManager = nullptr;
 	}
+	if (scene) {
+		scene->Uninit();
+		delete scene;
+	}
+	scene = nullptr;
+	*/
 	if (audio) {
 		audio->Uninit();
 		delete audio;
@@ -72,12 +78,8 @@ void Manager::Uninit()
 	}
 	colManager = nullptr;
 
-	if (scene) {
-		scene->Uninit();
-		delete scene;
-	}
-	scene = nullptr;
-	*/
+	
+	
 	if (dxManager) {
 		dxManager->Uninit();
 		delete dxManager;
@@ -93,7 +95,8 @@ void Manager::Uninit()
 
 void Manager::Update()
 {
-	/*input->Update();
+	input->Update();
+	/*
 	enemyManager->Update();
 	if (input->GetKeyTrigger('T')) {
 		dxManager->ToggleFrameMode();
@@ -106,16 +109,16 @@ void Manager::Update()
 
 void Manager::Draw()
 {
-	//dxManager->BeginDepth();
+	dxManager->BeginDepth();
 	//scene->Draw();	// W LV OrthoProj
-	//dxManager->BeginDeferred();
+	dxManager->BeginDeferred();
 	//scene->Draw(); // WVP , ↑↑の結果のテクスチャ , ↑↑で使ったfar
-	//dxManager->Begin();
+	dxManager->Begin();
 	//scene->DrawDeferred();
 
 
 	//enemyManager->Draw();
-	//dxManager->End();
+	dxManager->End();
 }
 
 void Manager::ChangeScene(Scene* nextScene)
