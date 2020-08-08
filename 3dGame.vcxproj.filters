@@ -25,6 +25,24 @@
     <Filter Include="ヘッダー ファイル\各種Collisionクラス">
       <UniqueIdentifier>{30194389-8632-44c8-9eaa-a36365f2cee0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Shader関連">
+      <UniqueIdentifier>{70cc5f64-3307-4c71-83fe-66448117b280}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Shader関連">
+      <UniqueIdentifier>{b487fdc2-8012-4501-983c-e6a9af757e18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\各種Componentクラス">
+      <UniqueIdentifier>{f23b44b2-a876-4e15-a32b-51cf1f347bcd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\各種Componentクラス">
+      <UniqueIdentifier>{4596bb46-207e-4b9f-bf40-073dd4aa8a14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Shader関連\cpp">
+      <UniqueIdentifier>{d7ffb095-2a34-4e02-ab17-fbb6f9f901b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Shader関連\hlsl">
+      <UniqueIdentifier>{aa87d32b-1e83-4f90-8e6e-4bc06b6581c9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\main.cpp">
@@ -63,11 +81,17 @@
     <ClCompile Include="Sources\CollisionSphere.cpp">
       <Filter>ソース ファイル\各種Collisionクラス</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Component.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\GameObject.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Component.cpp">
+      <Filter>ソース ファイル\各種Componentクラス</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Shader3D.cpp">
+      <Filter>ソース ファイル\Shader関連\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Texture.cpp">
+      <Filter>ソース ファイル\各種Componentクラス</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -107,11 +131,25 @@
     <ClInclude Include="Sources\CollisionSphere.h">
       <Filter>ヘッダー ファイル\各種Collisionクラス</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Component.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\GameObject.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Component.h">
+      <Filter>ヘッダー ファイル\各種Componentクラス</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Shader3D.h">
+      <Filter>ヘッダー ファイル\Shader関連</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Texture.h">
+      <Filter>ヘッダー ファイル\各種Componentクラス</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Sources\vertexShader3D.hlsl">
+      <Filter>ソース ファイル\Shader関連\hlsl</Filter>
+    </FxCompile>
+    <FxCompile Include="Sources\pixelShader3D.hlsl">
+      <Filter>ソース ファイル\Shader関連\hlsl</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
