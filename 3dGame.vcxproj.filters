@@ -93,6 +93,12 @@
     <ClCompile Include="Sources\Texture.cpp">
       <Filter>ソース ファイル\各種Componentクラス</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Model.cpp">
+      <Filter>ソース ファイル\各種Componentクラス</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Scene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\main.h">
@@ -142,6 +148,12 @@
     </ClInclude>
     <ClInclude Include="Sources\Texture.h">
       <Filter>ヘッダー ファイル\各種Componentクラス</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Model.h">
+      <Filter>ヘッダー ファイル\各種Componentクラス</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Scene.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

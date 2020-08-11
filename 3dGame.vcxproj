@@ -69,7 +69,14 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>C:\Users\ren_m\Desktop\3dGame\Assimp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\ren_m\Desktop\3dGame\Assimp\lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\Users\ren_m\Desktop\3dGame\Assimp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\ren_m\Desktop\3dGame\Assimp\lib\x86;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -128,6 +135,8 @@
     <ClCompile Include="Sources\InputManager.cpp" />
     <ClCompile Include="Sources\main.cpp" />
     <ClCompile Include="Sources\Manager.cpp" />
+    <ClCompile Include="Sources\Model.cpp" />
+    <ClCompile Include="Sources\Scene.cpp" />
     <ClCompile Include="Sources\Shader3D.cpp" />
     <ClCompile Include="Sources\Texture.cpp" />
     <ClCompile Include="Sources\WindowManager.cpp" />
@@ -146,6 +155,8 @@
     <ClInclude Include="Sources\InputManager.h" />
     <ClInclude Include="Sources\main.h" />
     <ClInclude Include="Sources\Manager.h" />
+    <ClInclude Include="Sources\Model.h" />
+    <ClInclude Include="Sources\Scene.h" />
     <ClInclude Include="Sources\Shader3D.h" />
     <ClInclude Include="Sources\Texture.h" />
     <ClInclude Include="Sources\WindowManager.h" />

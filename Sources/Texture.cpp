@@ -1,6 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION
+#include "../stb-master/stb.h"
 #include "../stb-master/stb_image.h"
-
 #include "DXManager.h"
 #include "Manager.h"
 #include "Component.h"
