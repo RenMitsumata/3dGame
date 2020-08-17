@@ -42,6 +42,8 @@ void Model::Draw()
 	NODE* curNode = rootNode;
 	XMFLOAT4X4 MatLoc = owner->GetTransformMatrix();
 	
+	context->UpdateSubresource(vertexBuffer, 0, nullptr, ver, 0, 0);
+
 	UINT stride = sizeof(VERTEX_3D);
 	UINT offset = 0;
 	context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
@@ -56,7 +58,9 @@ void Model::Draw()
 	XMMATRIX mat = XMLoadFloat4x4(&MatLoc);
 	mat = XMMatrixRotationRollPitchYaw(0.0f, XMConvertToRadians(180.0f), 0.0f) * mat;
 	//mat = XMMatrixTranspose(mat);
-	DrawNode(rootNode,mat);
+	XMFLOAT4X4 localMatrix;
+	XMStoreFloat4x4(&localMatrix, mat);
+	DrawNode(rootNode,&localMatrix);
 }
 
 void Model::Load(const char* filename)
@@ -149,6 +153,7 @@ void Model::Load(const char* filename)
 	// 頂点情報の登録
 	std::list<VERTEX_3D> vertexBuf;
 	pDeformVertexs = new std::vector<DEFORM_VERTEX>[pScene->mNumMeshes];
+	meshNum = pScene->mNumMeshes;
 
 	// アニメーションデータの登録
 	animNum = pScene->mNumAnimations;
@@ -169,6 +174,10 @@ void Model::Load(const char* filename)
 			animData[a].channels[c].rotDatas = new std::unordered_map<std::string, XMFLOAT4>[pNodeAnim->mNumRotationKeys];
 			animData[a].channels[c].posDatas = new std::unordered_map<std::string, XMFLOAT3>[pNodeAnim->mNumPositionKeys];
 			animData[a].channels[c].sizDatas = new std::unordered_map<std::string, XMFLOAT3>[pNodeAnim->mNumScalingKeys];
+			animData[a].channels[c].rotKeyNum = pNodeAnim->mNumRotationKeys;
+			animData[a].channels[c].posKeyNum = pNodeAnim->mNumPositionKeys;
+			animData[a].channels[c].sizKeyNum = pNodeAnim->mNumScalingKeys;
+
 
 			for (int frame = 0; frame < pNodeAnim->mNumRotationKeys; frame++) {
 				XMFLOAT4 quat;
@@ -360,6 +369,12 @@ void Model::Load(const char* filename)
 			defVertex.deformNormal.x = pScene->mMeshes[i]->mNormals[j].x;
 			defVertex.deformNormal.y = pScene->mMeshes[i]->mNormals[j].y;
 			defVertex.deformNormal.z = pScene->mMeshes[i]->mNormals[j].z;
+			defVertex.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+			if (pScene->mMeshes[i]->mTextureCoords[0] != nullptr) {
+				defVertex.texcoord = XMFLOAT2(pScene->mMeshes[i]->mTextureCoords[0][j].x, -pScene->mMeshes[i]->mTextureCoords[0][j].y);
+			}
+
+
 			defVertex.boneNum = 0;
 			for (auto b = 0; b < 4; b++) {
 				// defVertex.boneIndex = 0;
@@ -379,7 +394,8 @@ void Model::Load(const char* filename)
 				pBone->mOffsetMatrix.c1,pBone->mOffsetMatrix.c2,pBone->mOffsetMatrix.c3,pBone->mOffsetMatrix.c4,
 				pBone->mOffsetMatrix.d1,pBone->mOffsetMatrix.d2,pBone->mOffsetMatrix.d3,pBone->mOffsetMatrix.d4
 			};
-			Bones[pBone->mName.C_Str()].offsetMatrix = matrixBuf;
+			std::string boneName = pBone->mName.C_Str();
+			Bones[boneName].offsetMatrix = matrixBuf;
 
 			for (auto w = 0; w < pBone->mNumWeights; w++) {
 				aiVertexWeight weight = pBone->mWeights[w];
@@ -400,7 +416,7 @@ void Model::Load(const char* filename)
 
 
 
-
+	VerNum = Cnt;
 
 	vertexList = new VERTEX_3D[Cnt];
 	unsigned int n = 0;
@@ -425,6 +441,7 @@ void Model::Load(const char* filename)
 	device->CreateBuffer(&vertexBufferDesc, &vbData, &vertexBuffer);
 
 	//delete vertexList;
+	ver = new VERTEX_3D[VerNum];
 
 
 
@@ -504,6 +521,7 @@ void Model::Load(const char* filename)
 
 void Model::Uninit()
 {
+	delete[] ver;
 	DeleteNode(rootNode);
 	vertexBuffer->Release();
 	indexBuffer->Release();
@@ -558,10 +576,11 @@ void Model::UpdateBoneMatrix(NODE* node, XMFLOAT4X4* defMat)
 	XMFLOAT4X4 worldMatrix;
 	XMFLOAT4X4 resultMatrix;
 	XMMATRIX mat = XMLoadFloat4x4(defMat) * XMLoadFloat4x4(&pBone->animationMatrix);
-	XMStoreFloat4x4(&resultMatrix, mat);
+	//XMStoreFloat4x4(&resultMatrix, mat);
 
 	XMMATRIX offsetMat = XMLoadFloat4x4(&pBone->offsetMatrix);
 	mat *= offsetMat;
+	//XMStoreFloat4x4(&resultMatrix, mat);
 	XMStoreFloat4x4(&pBone->matrix, mat);
 
 	for (int n = 0; n < node->childNum; n++) {
@@ -579,19 +598,20 @@ void Model::UpdateAnimation()
 	// アニメーションのコマ送り
 	animFrame++;
 
-	int animChanNum = animData[animNum].channelNum;
+	//                                      ↓ここ？？？？？？
+	int animChanNum = animData[curAnimNum].channelNum;
 
 	for (auto c = 0; c < animChanNum; c++) {
 
 		//aiNodeAnim* pNodeAnim = pAnimation->mChannels[c];
 
-		ANIM_CHANNEL animChannel = animData[animNum].channels[c];
+		ANIM_CHANNEL animChannel = animData[curAnimNum].channels[c];
 
-		int f = animFrame % animChannel.rotDatas->size();
+		int f = animFrame % animChannel.rotKeyNum;
 
-		int p = animFrame % animChannel.posDatas->size();
+		int p = animFrame % animChannel.posKeyNum;
 
-		int s = animFrame % animChannel.sizDatas->size();
+		int s = animFrame % animChannel.sizKeyNum;
 
 		/*
 		m_NodeRotation[pNodeAnim->mNodeName.C_Str()] = pNodeAnim->mRotationKeys[1].mValue;
@@ -612,34 +632,34 @@ void Model::UpdateAnimation()
 		
 		// 移動
 		aiVector3D pos;
-		pos.x = (animChannel.posDatas[f])[animChannel.nodeName].x;
-		pos.y = (animChannel.posDatas[f])[animChannel.nodeName].y;
-		pos.z = (animChannel.posDatas[f])[animChannel.nodeName].z;
+		pos.x = (animChannel.posDatas[p])[animChannel.nodeName].x;
+		pos.y = (animChannel.posDatas[p])[animChannel.nodeName].y;
+		pos.z = (animChannel.posDatas[p])[animChannel.nodeName].z;
 
 		// スケール値
 		aiVector3D scaling;
-		scaling.x = (animChannel.sizDatas[f])[animChannel.nodeName].x;	// mScalingKeys[]の配列番号は、アニメーションフレームが入る
-		scaling.y = (animChannel.sizDatas[f])[animChannel.nodeName].y;	// mScalingKeys[]の配列番号は、アニメーションフレームが入る
-		scaling.z = (animChannel.sizDatas[f])[animChannel.nodeName].z;	// mScalingKeys[]の配列番号は、アニメーションフレームが入る
-
+		scaling.x = (animChannel.sizDatas[s])[animChannel.nodeName].x;
+		scaling.y = (animChannel.sizDatas[s])[animChannel.nodeName].y;
+		scaling.z = (animChannel.sizDatas[s])[animChannel.nodeName].z;
 
 		// 行列にしてボーンデータとして格納する
 		aiMatrix4x4 dat = aiMatrix4x4(scaling, rot, pos);
 		pBone->animationMatrix = Convert_aiMatrix(dat);
 	}
 
+	
 
 	// 各頂点の座標変換（本来はシェーダがやるべき）
-	for (unsigned int m = 0; m < pDeformVertexs->size(); m++)
+	for (unsigned int m = 0; m < meshNum; m++)
 	{
 		for (auto& vertex : pDeformVertexs[m])
 		{
 			XMFLOAT4X4 matrix[4];
 			XMFLOAT4X4 outMatrix;
-			matrix[0] = Bones[vertex.boneName[0]].matrix;
-			matrix[1] = Bones[vertex.boneName[1]].matrix;
-			matrix[2] = Bones[vertex.boneName[2]].matrix;
-			matrix[3] = Bones[vertex.boneName[3]].matrix;
+			matrix[0] = Bones[vertex.boneName[0]].animationMatrix;
+			matrix[1] = Bones[vertex.boneName[1]].animationMatrix;
+			matrix[2] = Bones[vertex.boneName[2]].animationMatrix;
+			matrix[3] = Bones[vertex.boneName[3]].animationMatrix;
 
 			//ウェイトを考慮してマトリクス算出
 			{
@@ -739,11 +759,11 @@ void Model::UpdateAnimation()
 			vec = XMVector3TransformNormal(vec, mat);
 			XMStoreFloat3(&vertex.deformPosition, vec);
 			
-
+			
 			//法線変換用に移動成分を削除
-			outMatrix._14 = 0.0f;
-			outMatrix._24 = 0.0f;
-			outMatrix._34 = 0.0f;
+			outMatrix._41 = 0.0f;
+			outMatrix._42 = 0.0f;
+			outMatrix._43 = 0.0f;
 
 			vertex.deformNormal = vertex.normal;
 
@@ -755,9 +775,24 @@ void Model::UpdateAnimation()
 
 		}
 	}
+	
+	unsigned int cnt = 0;
+
+	for (int i = 0; i < meshNum; i++) {
+		for (DEFORM_VERTEX v : pDeformVertexs[i]) {
+			
+			ver[cnt].Position = v.deformPosition;
+			ver[cnt].Normal = v.deformNormal;
+			ver[cnt].Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+			ver[cnt].TexCoord = v.texcoord;
+			cnt++;
+		}
+	}
+
+	
 
 	// 再帰的にボーンデータを更新する
-	//UpdateBoneMatrix(pScene->mRootNode, aiMatrix4x4());
+	UpdateBoneMatrix(rootNode, new XMFLOAT4X4());
 
 	
 }
@@ -802,19 +837,23 @@ void Model::DeleteNode(NODE* node)
 	
 }
 
-void Model::DrawNode(NODE* node, XMMATRIX mat)
+void Model::DrawNode(NODE* node, XMFLOAT4X4* mat)
 {
-	XMMATRIX localMat = XMLoadFloat4x4(&node->offsetMatrix);
+	XMMATRIX localMat;
+
 	
+	localMat = XMLoadFloat4x4(&node->offsetMatrix);
 	localMat = XMMatrixTranspose(localMat);
-	localMat = localMat * mat;
+	localMat = localMat * XMLoadFloat4x4(mat);
 	
+	
+	XMFLOAT4X4 res;
+	XMStoreFloat4x4(&res, localMat);
 
 	for (int i = 0; i < node->childNum; i++) {
-		DrawNode(node->childNode[i], localMat);
+		DrawNode(node->childNode[i], &res);
 	}
 
-	
 	XMFLOAT4X4 arg;
 	XMStoreFloat4x4(&arg, localMat);
 	shader->SetWorldMatrix(&arg);

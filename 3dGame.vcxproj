@@ -123,6 +123,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Sources\AudioManager.cpp" />
+    <ClCompile Include="Sources\Camera.cpp" />
     <ClCompile Include="Sources\Collision.cpp" />
     <ClCompile Include="Sources\CollisionCapsule.cpp" />
     <ClCompile Include="Sources\CollisionCone.cpp" />
@@ -131,11 +132,13 @@
     <ClCompile Include="Sources\CollisionSphere.cpp" />
     <ClCompile Include="Sources\Component.cpp" />
     <ClCompile Include="Sources\DXManager.cpp" />
+    <ClCompile Include="Sources\Game.cpp" />
     <ClCompile Include="Sources\GameObject.cpp" />
     <ClCompile Include="Sources\InputManager.cpp" />
     <ClCompile Include="Sources\main.cpp" />
     <ClCompile Include="Sources\Manager.cpp" />
     <ClCompile Include="Sources\Model.cpp" />
+    <ClCompile Include="Sources\Player.cpp" />
     <ClCompile Include="Sources\Scene.cpp" />
     <ClCompile Include="Sources\Shader3D.cpp" />
     <ClCompile Include="Sources\Texture.cpp" />
@@ -143,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\AudioManager.h" />
+    <ClInclude Include="Sources\Camera.h" />
     <ClInclude Include="Sources\Collision.h" />
     <ClInclude Include="Sources\CollisionCapsule.h" />
     <ClInclude Include="Sources\CollisionCone.h" />
@@ -151,11 +155,13 @@
     <ClInclude Include="Sources\CollisionSphere.h" />
     <ClInclude Include="Sources\Component.h" />
     <ClInclude Include="Sources\DXManager.h" />
+    <ClInclude Include="Sources\Game.h" />
     <ClInclude Include="Sources\GameObject.h" />
     <ClInclude Include="Sources\InputManager.h" />
     <ClInclude Include="Sources\main.h" />
     <ClInclude Include="Sources\Manager.h" />
     <ClInclude Include="Sources\Model.h" />
+    <ClInclude Include="Sources\Player.h" />
     <ClInclude Include="Sources\Scene.h" />
     <ClInclude Include="Sources\Shader3D.h" />
     <ClInclude Include="Sources\Texture.h" />

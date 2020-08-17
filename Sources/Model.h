@@ -25,7 +25,7 @@ struct NODE {	// <-- delete[]を忘れずに！
 	unsigned int childNum;
 	unsigned int* meshIndex;
 	unsigned int meshNum;
-	const char* nodeName;
+	std::string nodeName;
 	XMFLOAT4X4 offsetMatrix;
 };
 
@@ -42,6 +42,8 @@ struct DEFORM_VERTEX {
 	XMFLOAT3 deformPosition;
 	XMFLOAT3 normal;
 	XMFLOAT3 deformNormal;
+	XMFLOAT4 diffuse;
+	XMFLOAT2 texcoord;
 	int boneNum;
 	// int boneIndex[4];	←早いほう
 	std::string boneName[4];
@@ -63,6 +65,9 @@ struct ANIM_CHANNEL {
 	std::unordered_map<std::string, XMFLOAT4>* rotDatas;	// クォータニオン
 	std::unordered_map<std::string, XMFLOAT3>* posDatas;
 	std::unordered_map<std::string, XMFLOAT3>* sizDatas;
+	unsigned int rotKeyNum;
+	unsigned int posKeyNum;
+	unsigned int sizKeyNum;
 };
 
 struct ANIM_DATA {
@@ -89,14 +94,18 @@ private:
 	MESH* meshList;
 	unsigned short* indexList;
 	NODE* rootNode;
+	unsigned int VerNum;
+	VERTEX_3D* ver;
 
 	// アニメーション関連
 	std::vector<DEFORM_VERTEX>* pDeformVertexs = nullptr;
+	unsigned short meshNum;
 	std::unordered_map<std::string, BONE> Bones;
 	ANIM_DATA* animData = nullptr;
 	unsigned int* animChannels;	// FBXファイル１つにつき、複数アニメーションにするときは配列にする
-	bool isAnimated = false;	// アニメーション中か
-	unsigned int animNum = 0;	// 再生中のアニメーションの番号
+	bool isAnimated = true;	// アニメーション中か
+	unsigned int animNum;
+	unsigned int curAnimNum = 0;	// 再生中のアニメーションの番号
 	unsigned int animFrame = 0; // 再生中のアニメーションのフレーム番号
 
 	bool isTransition = false;				// アニメーションが遷移中かどうか
@@ -112,7 +121,7 @@ private:
 
 	NODE* RegisterNode(aiNode* pNode);
 	void DeleteNode(NODE* node);
-	void DrawNode(NODE* node, XMMATRIX mat);
+	void DrawNode(NODE* node, XMFLOAT4X4* mat);
 	XMFLOAT4X4 Convert_aiMatrix(const aiMatrix4x4& aiMat);
 public:
 	Model();

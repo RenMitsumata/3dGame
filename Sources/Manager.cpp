@@ -6,8 +6,8 @@
 ===========================================*/
 #include "WindowManager.h"
 #include "DXManager.h"
-//#include "Scene.h"
-//#include "Game.h"
+#include "Scene.h"
+#include "Game.h"
 //#include "Title.h"
 #include "InputManager.h"
 #include "CollisionManager.h"
@@ -48,8 +48,9 @@ void Manager::Init(HINSTANCE hInstance, int nCmdShow)
 	/*
 	enemyManager = new EnemyManager;
 	enemyManager->Init();
-	scene = new Title;
-	scene->Init();*/
+	*/
+	scene = new Game;
+	scene->Init();
 	
 }
 
@@ -60,12 +61,13 @@ void Manager::Uninit()
 		delete enemyManager;
 		enemyManager = nullptr;
 	}
+	*/
 	if (scene) {
 		scene->Uninit();
 		delete scene;
 	}
 	scene = nullptr;
-	*/
+	
 	if (audio) {
 		audio->Uninit();
 		delete audio;
@@ -104,18 +106,19 @@ void Manager::Update()
 	if (input->GetKeyTrigger('E')) {
 		isDebug = isDebug ^ true;
 	}
-	scene->Update();*/
+	*/
+	scene->Update();
 }
 
 void Manager::Draw()
 {
-	dxManager->BeginDepth();
+	//dxManager->BeginDepth();
 	//scene->Draw();	// W LV OrthoProj
-	dxManager->BeginDeferred();
+	//dxManager->BeginDeferred();
 	//scene->Draw(); // WVP , ↑↑の結果のテクスチャ , ↑↑で使ったfar
 	dxManager->Begin();
 	//scene->DrawDeferred();
-
+	scene->Draw();
 
 	//enemyManager->Draw();
 	dxManager->End();
