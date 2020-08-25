@@ -22,8 +22,8 @@ void Camera::Init()
 {
 	
 	context = Manager::Get()->GetDXManager()->GetDeviceContext();
-	pos = XMFLOAT3(0.0f,2.5f, -2.5f);
-	offset = XMFLOAT3(1.0f, 0.5f, -1.5f);
+	//pos = XMFLOAT3(0.0f,2.5f, -2.5f);
+	//offset = XMFLOAT3(1.0f, 0.5f, -1.5f);
 	focusLength = 5;
 	input = Manager::Get()->GetInput();
 	front = XMFLOAT3(0.0f, 0.0f, 1.0f);
@@ -185,6 +185,7 @@ void Camera::Draw()
 	for (Component* comp : componentsList) {
 		comp->Draw();
 	}
+
 }
 
 void Camera::AddDeltaRot(XMFLOAT3 rot)

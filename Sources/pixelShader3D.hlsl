@@ -40,11 +40,14 @@ float4 main(in PS_IN input) : SV_Target
 {
 	float4 outDiffuse = g_Texture.Sample(g_SamplerState,input.texcoord);
 
+	/*
 	outDiffuse = outDiffuse * input.color;
 
 	if (Diffuse.a != 0.0f) {
 		outDiffuse *= Diffuse;
 	}
+	*/
+
 	return outDiffuse;
 
 }

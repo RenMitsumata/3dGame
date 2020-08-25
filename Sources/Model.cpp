@@ -31,23 +31,28 @@ Model::~Model()
 
 void Model::Update()
 {
+	/*
 	if (animData != nullptr) {
 		UpdateAnimation();
 	}
+	*/
 
 }
 
 void Model::Draw()
 {
-	NODE* curNode = rootNode;
+	//NODE* curNode = rootNode;
 	XMFLOAT4X4 MatLoc = owner->GetTransformMatrix();
 	
-	context->UpdateSubresource(vertexBuffer, 0, nullptr, ver, 0, 0);
+	//context->UpdateSubresource(vertexBuffer, 0, nullptr, ver, 0, 0);
 
 	UINT stride = sizeof(VERTEX_3D);
 	UINT offset = 0;
 	context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
 	context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R16_UINT, 0);
+	context->UpdateSubresource(vertexBuffer, 0, nullptr, vertexList, 0, 0);
+	context->UpdateSubresource(indexBuffer, 0, nullptr, indexList, 0, 0);
+
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	shader->SetViewMatrix(manager->GetScene()->GetViewMatrix());
@@ -112,9 +117,6 @@ void Model::Load(const char* filename)
 		textureNum++;
 	}
 
-
-
-
 	// aiMaterialの読み込み->シェーダが読める形に変換
 	materialList = new MATERIAL*[pScene->mNumMaterials];
 	materialNum = 0;
@@ -145,6 +147,113 @@ void Model::Load(const char* filename)
 
 		materialNum++;
 	}
+
+	// ノード情報の登録
+	aiNode* pRootNode = pScene->mRootNode;
+	rootNode = RegisterNode(pRootNode);
+	
+
+
+	// メッシュ情報を登録 & インデックス情報を登録
+	meshList = new MESH[pScene->mNumMeshes];
+
+	unsigned int indexnum = 0;
+	for (int i = 0; i < pScene->mNumMeshes; i++) {
+
+		meshList[i].indexOffset = indexnum;
+		const aiMesh* pMesh = pScene->mMeshes[i];
+		unsigned short indexNumber = indexnum;
+		for (int j = 0; j < pMesh->mNumFaces; j++) {
+			const aiFace face = pMesh->mFaces[j];
+			indexnum += face.mNumIndices;
+		}
+		indexNumber = indexnum - indexNumber;
+		meshList[i].indexNum = indexNumber;
+		meshList[i].materialIndex = pMesh->mMaterialIndex;
+	}
+
+	indexList = new unsigned short[indexnum];
+
+	unsigned int indexpos = 0;
+	for (int i = 0; i < pScene->mNumMeshes; i++) {
+		const aiMesh* pMesh = pScene->mMeshes[i];
+		for (int j = 0; j < pMesh->mNumFaces; j++) {
+			const aiFace face = pMesh->mFaces[j];
+			for (int k = 0; k < face.mNumIndices; k++) {
+				indexList[indexpos] = face.mIndices[k];
+				indexpos++;
+			}
+		}
+	}
+
+	//-----------------------------------
+	//　ポーズ（非アニメーション）部分
+	//-----------------------------------
+
+	// ノード情報の取得（ポーズ）
+	const aiNode* pNode = pScene->mRootNode;
+	
+	// 頂点情報の取得（ポーズ）
+	unsigned int vertexNum = 0;
+	for (int i = 0; i < pScene->mNumMeshes; i++) {
+		vertexNum += pScene->mMeshes[i]->mNumVertices;
+	}
+	vertexList = new VERTEX_3D[vertexNum];
+
+	// 頂点情報の登録（ポーズ）
+	unsigned int vertexCnt = 0;
+	for (int i = 0; i < pScene->mNumMeshes; i++) {
+		const aiMesh* pMesh = pScene->mMeshes[i];
+		for (int j = 0; j < pMesh->mNumVertices; j++) {
+			const aiVector3D pVec = pMesh->mVertices[j];
+			const aiVector3D pVecNorm = pMesh->mNormals[j];
+
+			// 頂点座標
+			vertexList[vertexCnt].Position = XMFLOAT3(pVec.x, pVec.y, pVec.z);
+
+			// 頂点の法線
+			vertexList[vertexCnt].Normal = XMFLOAT3(pVecNorm.x, pVecNorm.y, pVecNorm.z);
+
+			// 頂点カラーは、パレット０の値を適応（なければ、不透過白）
+			if (pMesh->mColors[0] == nullptr) {
+				vertexList[vertexCnt].Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+			}
+			else {
+				const aiColor4D color = pMesh->mColors[0][j];
+				vertexList[vertexCnt].Diffuse = XMFLOAT4(color.r, color.g, color.b, color.a);
+			}
+
+			// 頂点のUV座標
+			if (pMesh->mTextureCoords[0] == nullptr) {
+				vertexList[vertexCnt].TexCoord = XMFLOAT2(0.0f,0.0f);
+			}
+			else {
+				const aiVector3D texcoord = pMesh->mTextureCoords[0][j];
+				vertexList[vertexCnt].TexCoord = XMFLOAT2(texcoord.x, -texcoord.y);
+			}
+			vertexCnt++;
+		}
+	}
+
+
+
+	//-----------------------------------
+	//　アニメーション部分
+	//-----------------------------------
+
+	animNum = pScene->mNumAnimations;
+
+	// ノード情報の登録
+	pNode = pScene->mRootNode;
+
+	VERTEX_3D** pVertexArray = new VERTEX_3D*[pScene->mNumMeshes];
+
+
+
+
+
+
+	/*
 
 	// ノード情報の登録
 	aiNode* pNode = pScene->mRootNode;
@@ -331,104 +440,14 @@ void Model::Load(const char* filename)
 
 		*/
 
-	}
+	
 
 
-	unsigned int Cnt = 0;
-
-	for (int i = 0; i < pScene->mNumMeshes; i++) {
-		for (int j = 0; j < pScene->mMeshes[i]->mNumVertices; j++) {
-
-
-			VERTEX_3D v;			
-			
-			v.Position = XMFLOAT3(pScene->mMeshes[i]->mVertices[j].x , pScene->mMeshes[i]->mVertices[j].y , pScene->mMeshes[i]->mVertices[j].z);
-			v.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-			v.Normal = XMFLOAT3(pScene->mMeshes[i]->mNormals[j].x, pScene->mMeshes[i]->mNormals[j].y, pScene->mMeshes[i]->mNormals[j].z);
-			
-			if (pScene->mMeshes[i]->mTextureCoords[0] != nullptr) {
-				v.TexCoord = XMFLOAT2(pScene->mMeshes[i]->mTextureCoords[0][j].x, -pScene->mMeshes[i]->mTextureCoords[0][j].y);
-			}
-			else {
-				v.TexCoord = XMFLOAT2(0.0f, 0.0f);
-			}
-			vertexBuf.push_back(v);
-
-
-			// アニメーション用の頂点データにメッシュの初期値を代入し初期化
-			DEFORM_VERTEX defVertex;
-			defVertex.position.x = pScene->mMeshes[i]->mVertices[j].x;
-			defVertex.position.y = pScene->mMeshes[i]->mVertices[j].y;
-			defVertex.position.z = pScene->mMeshes[i]->mVertices[j].z;
-			defVertex.deformPosition.x = pScene->mMeshes[i]->mVertices[j].x;
-			defVertex.deformPosition.y = pScene->mMeshes[i]->mVertices[j].y;
-			defVertex.deformPosition.z = pScene->mMeshes[i]->mVertices[j].z;
-			defVertex.normal.x = pScene->mMeshes[i]->mNormals[j].x;
-			defVertex.normal.y = pScene->mMeshes[i]->mNormals[j].y;
-			defVertex.normal.z = pScene->mMeshes[i]->mNormals[j].z;
-			defVertex.deformNormal.x = pScene->mMeshes[i]->mNormals[j].x;
-			defVertex.deformNormal.y = pScene->mMeshes[i]->mNormals[j].y;
-			defVertex.deformNormal.z = pScene->mMeshes[i]->mNormals[j].z;
-			defVertex.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-			if (pScene->mMeshes[i]->mTextureCoords[0] != nullptr) {
-				defVertex.texcoord = XMFLOAT2(pScene->mMeshes[i]->mTextureCoords[0][j].x, -pScene->mMeshes[i]->mTextureCoords[0][j].y);
-			}
-
-
-			defVertex.boneNum = 0;
-			for (auto b = 0; b < 4; b++) {
-				// defVertex.boneIndex = 0;
-				defVertex.boneName[b] = {};
-				defVertex.boneWeight[b] = 0.0f;
-			}
-			pDeformVertexs[i].push_back(defVertex);
-			Cnt++;
-		}
-		// アニメーション用ボーンデータをセット
-		for (auto b = 0; b < pScene->mMeshes[i]->mNumBones; b++) {
-			aiBone* pBone = pScene->mMeshes[i]->mBones[b];
-
-			XMFLOAT4X4 matrixBuf = {
-				pBone->mOffsetMatrix.a1,pBone->mOffsetMatrix.a2,pBone->mOffsetMatrix.a3,pBone->mOffsetMatrix.a4,
-				pBone->mOffsetMatrix.b1,pBone->mOffsetMatrix.b2,pBone->mOffsetMatrix.b3,pBone->mOffsetMatrix.b4,
-				pBone->mOffsetMatrix.c1,pBone->mOffsetMatrix.c2,pBone->mOffsetMatrix.c3,pBone->mOffsetMatrix.c4,
-				pBone->mOffsetMatrix.d1,pBone->mOffsetMatrix.d2,pBone->mOffsetMatrix.d3,pBone->mOffsetMatrix.d4
-			};
-			std::string boneName = pBone->mName.C_Str();
-			Bones[boneName].offsetMatrix = matrixBuf;
-
-			for (auto w = 0; w < pBone->mNumWeights; w++) {
-				aiVertexWeight weight = pBone->mWeights[w];
-
-
-
-				pDeformVertexs[i][weight.mVertexId].boneWeight[pDeformVertexs[i][weight.mVertexId].boneNum] = weight.mWeight;
-				pDeformVertexs[i][weight.mVertexId].boneName[pDeformVertexs[i][weight.mVertexId].boneNum] = pBone->mName.C_Str();
-				pDeformVertexs[i][weight.mVertexId].boneNum++;
-				if (pDeformVertexs[i][weight.mVertexId].boneNum > 4) {
-					MessageBox(nullptr, "このモデルデータは正しく表示されない可能性があります", "警告", MB_OK);
-				}
-			}
-		}
-	}
-
-
-
-
-
-	VerNum = Cnt;
-
-	vertexList = new VERTEX_3D[Cnt];
-	unsigned int n = 0;
-	for (VERTEX_3D vertex : vertexBuf) {
-		vertexList[n] = vertex;
-		n++;
-	}
-
+	
 
 	// 頂点バッファの作製
 	D3D11_BUFFER_DESC vertexBufferDesc;
-	vertexBufferDesc.ByteWidth = sizeof(VERTEX_3D) * Cnt;
+	vertexBufferDesc.ByteWidth = sizeof(VERTEX_3D) * vertexNum;
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0;
@@ -440,48 +459,10 @@ void Model::Load(const char* filename)
 	vbData.SysMemSlicePitch = 0;
 	device->CreateBuffer(&vertexBufferDesc, &vbData, &vertexBuffer);
 
-	//delete vertexList;
-	ver = new VERTEX_3D[VerNum];
 
-
-
-
-	// インデックス情報の登録
-	
-	std::list<unsigned short> indexBuf;
-	meshList = new MESH[pScene->mNumMeshes];
-
-	unsigned int StartCnt = 0;
-	unsigned int offsetVertex = 0;
-	unsigned short indexIns;
-	for (int i = 0; i < pScene->mNumMeshes; i++) {
-		unsigned int size = 0;
-		meshList[i].indexOffset = StartCnt;
-		meshList[i].materialIndex = pScene->mMeshes[i]->mMaterialIndex;
-
-		for (int j = 0; j < pScene->mMeshes[i]->mNumFaces; j++) {
-			for (int k = 0; k < pScene->mMeshes[i]->mFaces[j].mNumIndices; k++) {
-				indexIns = pScene->mMeshes[i]->mFaces[j].mIndices[k];
-				indexIns += offsetVertex;
-				indexBuf.push_back(indexIns);
-				size++;
-			}
-		}
-		meshList[i].indexNum = size;
-		offsetVertex += pScene->mMeshes[i]->mNumVertices;
-		StartCnt += size;
-	}
-
-	indexList = new unsigned short[indexBuf.size()];
-	unsigned int x = 0;
-	for (unsigned short index : indexBuf) {
-		indexList[x] = index;
-		x++;
-	}
-
-	
+	// インデックスバッファの作製
 	D3D11_BUFFER_DESC indexBufferDesc;
-	indexBufferDesc.ByteWidth = sizeof(unsigned short) * indexBuf.size();
+	indexBufferDesc.ByteWidth = sizeof(unsigned short) * indexnum;
 	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	indexBufferDesc.CPUAccessFlags = 0;
@@ -517,14 +498,19 @@ void Model::Load(const char* filename)
 	context->PSSetSamplers(0, 1, &samplerState);
 	
 	aiReleaseImport(pScene);
+
 }
 
 void Model::Uninit()
 {
-	delete[] ver;
-	DeleteNode(rootNode);
+	
+	delete[] vertexList;
+	delete[] indexList;
+	//delete[] ver;
+	//DeleteNode(rootNode);
 	vertexBuffer->Release();
 	indexBuffer->Release();
+	/*
 	if (animNum > 0) {
 		for (int i = 0; i < animNum; i++) {
 			for (int j = 0; j < animChannels[i]; j++) {
@@ -537,9 +523,9 @@ void Model::Uninit()
 		delete[] animData;
 		delete[] animChannels;
 	}
-	delete[] pDeformVertexs;
+	*/
+	//delete[] pDeformVertexs;
 	delete[] meshList;
-	delete[] vertexList;
 	
 	for (int i = 0; i < materialNum; i++) {
 		if (materialList[i]) {
@@ -563,14 +549,76 @@ void Model::Uninit()
 
 }
 
+//-----------------------------------------------------------------------------------------------------
+//　第１引数：行列（末端ノードへ向けてスタックする）
+//　第２引数：フレーム数
+//　第３引数：チャンネル（配列の先頭アドレス）
+//　第４引数：第３引数の配列サイズ
+//　第５引数：現在のノード（チャンネルの名前と照合）
+//　第６引数：計算結果の頂点データを格納するための配列へのポインタ
+//-----------------------------------------------------------------------------------------------------
+
+void Model::CalcAnimVertex(const aiMatrix4x4& matrix, const unsigned int& frame, const aiScene* pScene, const aiNodeAnim* pChannel,const unsigned int& channelNum, const aiNode* pNode, VERTEX_3D** ppVertex)
+{
+	aiMatrix4x4 nodeMatrix = matrix;
+
+	// 現在ノードの行列を計算する
+	for (int i = 0; i < channelNum; i++) {
+		if (pNode->mName == pChannel[i].mNodeName) {
+			aiVectorKey posKey = pChannel[i].mPositionKeys[frame];
+			aiQuatKey rotKey = pChannel[i].mRotationKeys[frame];
+			aiVectorKey sizKey = pChannel[i].mScalingKeys[frame];
+			aiMatrix4x4 localNodeMatrix = aiMatrix4x4(sizKey.mValue, rotKey.mValue, posKey.mValue);
+			nodeMatrix = localNodeMatrix * nodeMatrix;
+			break;
+		}
+	}
+
+	// 子ノードについても計算する
+	for (int i = 0; i < pNode->mNumChildren; i++) {
+		CalcAnimVertex(nodeMatrix, frame, pScene, pChannel, channelNum, pNode->mChildren[i], ppVertex);
+	}
+
+	// 自ノードの持つメッシュは？
+	for (int i = 0; i < pNode->mNumMeshes; i++) {
+		unsigned int vertexNum = pScene->mMeshes[pNode->mMeshes[i]]->mNumVertices;
+		ppVertex[pNode->mMeshes[i]] = new VERTEX_3D[vertexNum];
+
+		// 頂点データの座標変換
+		for (int j = 0; j < vertexNum; j++) {
+			aiVector3D deformPos = pScene->mMeshes[pNode->mMeshes[i]]->mVertices[j];
+			aiTransformVecByMatrix4(&deformPos, &nodeMatrix);
+			aiVector3D deformNor = pScene->mMeshes[pNode->mMeshes[i]]->mNormals[j];
+			aiTransformVecByMatrix4(&deformNor, &nodeMatrix);
+			const aiColor4D color = pScene->mMeshes[pNode->mMeshes[i]]->mColors[0][j];
+			XMFLOAT4 vertexColor = XMFLOAT4(color.r, color.g, color.b, color.a);
+			const aiVector3D tex = pScene->mMeshes[pNode->mMeshes[i]]->mTextureCoords[0][j];
+			XMFLOAT2 texcoord = XMFLOAT2(tex.x, tex.y);
+
+			ppVertex[j][pNode->mMeshes[i]].Position.x = deformPos.x;
+			ppVertex[j][pNode->mMeshes[i]].Position.y = deformPos.y;
+			ppVertex[j][pNode->mMeshes[i]].Position.z = deformPos.z;
+			ppVertex[j][pNode->mMeshes[i]].Normal.x = deformNor.x;
+			ppVertex[j][pNode->mMeshes[i]].Normal.y = deformNor.y;
+			ppVertex[j][pNode->mMeshes[i]].Normal.z = deformNor.z;
+			ppVertex[j][pNode->mMeshes[i]].Diffuse = vertexColor;
+			ppVertex[j][pNode->mMeshes[i]].TexCoord = texcoord;
+		}
+	}
+
+
+
+}
+
 void Model::CreateBone(NODE* node)
 {
-	BONE bone = {};
-	Bones[node->nodeName] = bone;	// ノードの名前をボーン検索名にする = ボーン名
+	//BONE bone = {};
+	//Bones[node->nodeName] = bone;	// ノードの名前をボーン検索名にする = ボーン名
 }
 
 void Model::UpdateBoneMatrix(NODE* node, XMFLOAT4X4* defMat)
 {
+	/*
 	BONE* pBone = &Bones[node->nodeName];
 	
 	XMFLOAT4X4 worldMatrix;
@@ -586,10 +634,13 @@ void Model::UpdateBoneMatrix(NODE* node, XMFLOAT4X4* defMat)
 	for (int n = 0; n < node->childNum; n++) {
 		UpdateBoneMatrix(node->childNode[n], &resultMatrix);
 	}
+	*/
 }
 
 void Model::UpdateAnimation()
 {
+	/*
+
 	// アニメーション再生中でない場合は終了
 	if (!isAnimated) {
 		return;
@@ -612,12 +663,6 @@ void Model::UpdateAnimation()
 		int p = animFrame % animChannel.posKeyNum;
 
 		int s = animFrame % animChannel.sizKeyNum;
-
-		/*
-		m_NodeRotation[pNodeAnim->mNodeName.C_Str()] = pNodeAnim->mRotationKeys[1].mValue;
-
-		m_NodePosition[pNodeAnim->mNodeName.C_Str()] = pNodeAnim->mPositionKeys[1].mValue;
-		*/
 
 
 		BONE* pBone = &Bones[animChannel.nodeName];
@@ -793,7 +838,7 @@ void Model::UpdateAnimation()
 
 	// 再帰的にボーンデータを更新する
 	UpdateBoneMatrix(rootNode, new XMFLOAT4X4());
-
+	*/
 	
 }
 
@@ -818,7 +863,7 @@ NODE* Model::RegisterNode(aiNode* pNode)
 		node->childNode[i] = RegisterNode(pNode->mChildren[i]);
 		node->childNode[i]->parentNode = node;
 	}
-	CreateBone(node);
+	//CreateBone(node);
 	return node;
 }
 

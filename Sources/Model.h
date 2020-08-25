@@ -20,11 +20,11 @@
 
 // ノード構造体。子ノードなどの情報を確保
 struct NODE {	// <-- delete[]を忘れずに！
-	NODE* parentNode;
-	NODE** childNode;
-	unsigned int childNum;
-	unsigned int* meshIndex;
-	unsigned int meshNum;
+	NODE* parentNode;			// 親のノード（ポインタ）
+	NODE** childNode;			// 子のノード（ポインタの配列）
+	unsigned int childNum;		// ↑の配列のサイズ
+	unsigned int* meshIndex;	// ノードに属するメッシュのインデックス（配列・メッシュデータは別の場所に保存）
+	unsigned int meshNum;		// ↑の配列のサイズ
 	std::string nodeName;
 	XMFLOAT4X4 offsetMatrix;
 };
@@ -80,20 +80,39 @@ struct ANIM_DATA {
 class Model : public Component
 {
 private:
+	// マネージャ、D3D11関係
 	Manager* manager;
 	Shader3D* shader;
 	ID3D11Device* device;
 	ID3D11DeviceContext* context;
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* indexBuffer;
-	Texture** textureList;
-	unsigned int textureNum;
-	MATERIAL** materialList;
-	unsigned int materialNum;
-	VERTEX_3D* vertexList;
-	MESH* meshList;
-	unsigned short* indexList;
-	NODE* rootNode;
+
+	// テクスチャ（シェーダーリソース）関係
+	Texture** textureList;		// テクスチャ（クラスのポインタ）の配列
+	unsigned int textureNum;	// ↑の配列サイズ
+
+	// マテリアル（シェーダー定数）関係
+	MATERIAL** materialList;	// マテリアル（構造体のポインタ）の配列
+	unsigned int materialNum;	// ↑の配列サイズ
+	
+	// メッシュ関係
+	VERTEX_3D* vertexList;		// 頂点バッファ用の座標データの配列（ポーズ時）
+	MESH* meshList;				// 頂点バッファのインデックスのオフセット、プリミティブ数、マテリアル情報などを収納
+	unsigned short* indexList;	// インデックスバッファ用のデータ
+	NODE* rootNode;				// ルートノードのポインタ
+
+
+
+	// アニメーション関係
+	unsigned int animNum;		// FBXファイルに搭載されているアニメーションの数
+	unsigned int* channelNum;	// 　　　　　　〃　　　　　　 チャンネルの数（アニメーション数分の配列）
+
+	void CalcAnimVertex(const aiMatrix4x4& matrix, const unsigned int& frame, const aiScene* pScene, const aiNodeAnim* pChannel,const unsigned int& channelNum, const aiNode* pNode, VERTEX_3D** ppVertex);
+
+	
+
+	/*
 	unsigned int VerNum;
 	VERTEX_3D* ver;
 
@@ -113,6 +132,10 @@ private:
 	unsigned int lastAnimFrame = 0;			// ↑のアニメーションのフレーム番号（遷移用）
 	unsigned short transCount = 0;			// アニメーション遷移完了までの所要フレーム
 	unsigned short currentTransCount = 0;	// ↑の現在フレーム
+
+
+	*/
+
 
 
 	void CreateBone(NODE* node);
